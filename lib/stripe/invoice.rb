@@ -2,28 +2,45 @@ module Stripe
   class Invoice < APIResource
     extend Stripe::APIOperations::List
     include Stripe::APIOperations::Save
+    include Stripe::APIOperations::Delete
     extend Stripe::APIOperations::Create
 
     OBJECT_NAME = 'invoice'
 
-    def self.upcoming(params, opts={})
-      resp, opts = request(:get, upcoming_url, params, opts)
-      Util.convert_to_stripe_object(resp.data, opts)
-    end
-
-    def pay(params={}, opts={})
-      resp, opts = request(:post, pay_url, params, opts)
+    def finalize_invoice(params = {}, opts = {})
+      url = resource_url + "/finalize"
+      resp, opts = request(:post, url, params, opts)
       initialize_from(resp.data, opts)
     end
 
-    private
-
-    def self.upcoming_url
-      resource_url + '/upcoming'
+    def mark_uncollectible(params = {}, opts = {})
+      url = resource_url + "/mark_uncollectible"
+      resp, opts = request(:post, url, params, opts)
+      initialize_from(resp.data, opts)
     end
 
-    def pay_url
-      resource_url + '/pay'
+    def pay(params = {}, opts = {})
+      url = resource_url + "/pay"
+      resp, opts = request(:post, url, params, opts)
+      initialize_from(resp.data, opts)
+    end
+
+    def send_invoice(params = {}, opts = {})
+      url = resource_url + "/send"
+      resp, opts = request(:post, url, params, opts)
+      initialize_from(resp.data, opts)
+    end
+
+    def self.upcoming(params, opts = {})
+      url = resource_url + "/upcoming"
+      resp, opts = request(:get, url, params, opts)
+      Util.convert_to_stripe_object(resp.data, opts)
+    end
+
+    def void_invoice(params = {}, opts = {})
+      url = resource_url + "/void"
+      resp, opts = request(:post, url, params, opts)
+      initialize_from(resp.data, opts)
     end
   end
 end
